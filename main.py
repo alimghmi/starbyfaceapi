@@ -9,7 +9,7 @@ import re
 from bs4 import BeautifulSoup
 
 
-def crawl(photo):
+def scraper(photo):
     url = "https://starbyface.com/"
     
     headers = {
@@ -26,7 +26,7 @@ def crawl(photo):
     }
 
     req = requests.Session()
-    final_result = {
+    _res_ = {
         'name': None,
         'similarity': None,
         'pic': None,
@@ -35,7 +35,7 @@ def crawl(photo):
     }
 
     data = {'name': 'imageUploadForm'}
-    files = {'imageUploadForm': photo}#open(photo, "rb")}
+    files = {'imageUploadForm': open(photo, "rb")}
     req.get(url, headers=headers)
 
     cookies = {
@@ -50,15 +50,20 @@ def crawl(photo):
     case = soup.find_all('div', class_ = \
         'col-lg-3 col-offset-3 candidate realCandidate text-left')[0]
 
-    final_result['name'] = case['name']
-    final_result['similarity'] = case.find('div', \
+    _res_['name'] = case['name']
+    
+    _res_['similarity'] = case.find('div', \
         class_ = 'progress progress-striped').text.strip()
-    final_result['pic'] = case.find('img', class_ = 'img-thumbnail')['src']
+    
+    _res_['pic'] = case.find('img', class_ = 'img-thumbnail')['src']
+    
     result = url + case.find('button', \
         class_ = 'btn btn-default')['gridhref'] + '&type=0'
+    
     soup_ = BeautifulSoup(req.get(result, headers=headers).text \
             , features="html.parser")
-    final_result['download'] = url + soup_.find('img',  \
+    
+    _res_['download'] = url + soup_.find('img',  \
         class_ = 'img-thumbnail')['src']
 
-    return final_result
+    return _res_
